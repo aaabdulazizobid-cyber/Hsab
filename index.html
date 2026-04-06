@@ -3,39 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الحلال - النسخة الاحترافية</title>
+    <title>نظام حسابات الشركاء المتكامل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary-color: #1e3a5f; --secondary-color: #c5a059; --bg-color: #f4f7f9; --white: #ffffff; --danger: #e74c3c; --success: #27ae60; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 15px; }
         .container { max-width: 1100px; margin: auto; }
-        header { background: var(--primary-color); color: white; padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .btn-action { background: var(--secondary-color); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-right: 5px; font-size: 0.85rem; }
+        header { background: var(--primary-color); color: white; padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-action { background: var(--secondary-color); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-right: 5px; }
         .partners-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .card { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--secondary-color); }
+        .card { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--secondary-color); position: relative; }
         .control-panel { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px; }
         @media (max-width: 800px) { .control-panel { grid-template-columns: 1fr; } }
-        .panel-box { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
+        .panel-box { background: var(--white); padding: 20px; border-radius: 15px; }
         select, input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px; box-sizing: border-box; }
-        .btn-submit { width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; font-size: 1rem; }
         .summary-stats { background: var(--primary-color); color: white; padding: 20px; border-radius: 15px; }
         .growth-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-top: 15px; text-align: center; border: 1px solid var(--secondary-color); }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
         .modal-content { background: var(--white); margin: 5% auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 550px; height: 80vh; display: flex; flex-direction: column; }
         .history-list { flex: 1; overflow-y: auto; margin-top: 15px; }
         .history-item { background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-right: 5px solid var(--secondary-color); display: flex; justify-content: space-between; align-items: center; }
-        .cat-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 5px; color: white; }
-        .data-management { margin-top: 15px; padding: 15px; background: #eee; border-radius: 10px; display: flex; gap: 10px; justify-content: center; }
+        .final-result { font-size: 1.2rem; font-weight: bold; padding: 10px; border-radius: 8px; text-align: center; margin-top: 10px; }
+        .bg-win { background: #e8f5e9; color: var(--success); }
+        .bg-loss { background: #ffebee; color: var(--danger); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>نظام حسابات الحلال</h1>
+        <h1>نظام حسابات الحلال (تقسيم الأرباح والمصاريف)</h1>
         <div>
-            <button class="btn-action" onclick="openModal()"><i class="fas fa-chart-pie"></i> السجل والتحليل</button>
+            <button class="btn-action" onclick="openModal()"><i class="fas fa-database"></i> السجل والبيانات</button>
             <button class="btn-action" style="background:#27ae60" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> تصدير إكسل</button>
         </div>
     </header>
@@ -44,33 +43,40 @@
 
     <div class="control-panel">
         <div class="panel-box">
-            <h3>تسجيل عملية</h3>
+            <h3>تسجيل عملية جديدة</h3>
+            <label>نوع العملية</label>
             <select id="opType" onchange="toggleCategory()">
-                <option value="exp">مصروف (شراء)</option>
-                <option value="sale">بيع (دخل)</option>
+                <option value="exp">مصروف (شراء مستلزمات)</option>
+                <option value="sale">بيع (دخل للمشروع)</option>
             </select>
-            <div id="categoryDiv"><label>النوع</label>
+            <div id="categoryDiv">
+                <label>التصنيف</label>
                 <select id="expCategory"><option>علف</option><option>أدوية</option><option>شبوك</option><option>أخرى</option></select>
             </div>
-            <div id="payerDiv"><label>من دفع؟</label>
+            <div id="payerDiv">
+                <label>من دفع المبلغ؟</label>
                 <select id="personName"><option>زايد</option><option>زياد</option><option>عبدالعزيز</option></select>
             </div>
-            <label>المبلغ</label><input type="number" id="amountInput" placeholder="0.00">
-            <label>البيان</label><input type="text" id="noteInput" placeholder="...">
-            <button id="submitBtn" class="btn-submit" style="background:var(--primary-color)" onclick="saveData()">إضافة العملية</button>
+            <label>المبلغ (ريال)</label>
+            <input type="number" id="amountInput" placeholder="0.00">
+            <label>وصف مختصر</label>
+            <input type="text" id="noteInput" placeholder="مثلاً: شراء شعير، بيع طليان..">
+            <button id="submitBtn" class="btn-action" style="width:100%; padding:15px; background:var(--primary-color)" onclick="saveData()">حفظ العملية</button>
         </div>
 
         <div class="summary-stats">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; text-align: center;">
-                <div><small>المصاريف</small><div id="totalExp" style="font-size:1.5rem; color:var(--secondary-color)">0</div></div>
-                <div><small>المبيعات</small><div id="totalSales" style="font-size:1.5rem; color:var(--secondary-color)">0</div></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; text-align: center; gap: 10px;">
+                <div><small>إجمالي المصاريف</small><div id="totalExp" style="font-size:1.4rem; color:var(--secondary-color)">0</div></div>
+                <div><small>إجمالي المبيعات</small><div id="totalSales" style="font-size:1.4rem; color:var(--secondary-color)">0</div></div>
             </div>
             <div class="growth-box">
-                <small>نسبة النمو</small><div id="growthRate" style="font-size:2rem; font-weight:bold">0%</div>
-                <small id="netProfit">الصافي: 0 ريال</small>
+                <small>صافي ربح المشروع</small>
+                <div id="netProfit" style="font-size:1.8rem; font-weight:bold">0 ريال</div>
+                <div id="growthRate" style="font-size:0.9rem; opacity:0.8">النمو: 0%</div>
             </div>
-            <div style="text-align:center; margin-top:10px; border-top:1px solid #444; padding-top:10px;">
-                <small>عمولة المدير (10%)</small><div id="managerFee" style="color:#4ade80">0 ريال</div>
+            <div style="text-align:center; margin-top:15px; border-top:1px solid rgba(255,255,255,0.2); padding-top:10px;">
+                <small>عمولة المدير (10%) من البيع</small>
+                <div id="managerFee" style="color:#4ade80; font-size:1.2rem;">0 ريال</div>
             </div>
         </div>
     </div>
@@ -79,19 +85,17 @@
 <div id="logModal" class="modal">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between"><h3>قاعدة البيانات والسجلات</h3><span style="cursor:pointer; font-size:24px;" onclick="closeModal()">&times;</span></div>
-        
-        <div class="data-management">
-            <button onclick="downloadBackup()" class="btn-action"><i class="fas fa-download"></i> حفظ نسخة احتياطية</button>
-            <button onclick="document.getElementById('fileInput').click()" class="btn-action" style="background:#34495e"><i class="fas fa-upload"></i> استرداد نسخة</button>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <button onclick="downloadBackup()" class="btn-action" style="flex:1">حفظ نسخة</button>
+            <button onclick="document.getElementById('fileInput').click()" class="btn-action" style="flex:1; background:#34495e">استرداد</button>
             <input type="file" id="fileInput" style="display:none" onchange="importBackup(event)">
         </div>
-
         <div class="history-list" id="modalLog"></div>
     </div>
 </div>
 
 <script>
-    let state = { logs: JSON.parse(localStorage.getItem('farmData')) || [] };
+    let state = { logs: JSON.parse(localStorage.getItem('farmDataV2')) || [] };
     const colors = { "علف": "#e67e22", "أدوية": "#9b59b6", "شبوك": "#34495e", "أخرى": "#95a5a6", "بيع": "#27ae60" };
 
     function toggleCategory() {
@@ -103,80 +107,79 @@
     function saveData() {
         const type = document.getElementById('opType').value;
         const amt = parseFloat(document.getElementById('amountInput').value);
-        if (!amt || amt <= 0) return alert("أدخل مبلغاً");
+        if (!amt || amt <= 0) return alert("أدخل مبلغاً صحيحاً");
         state.logs.unshift({
             id: Date.now(), type, val: amt, 
             cat: type === 'exp' ? document.getElementById('expCategory').value : 'بيع',
             who: type === 'exp' ? document.getElementById('personName').value : 'مبيعات',
-            note: document.getElementById('noteInput').value || '..',
+            note: document.getElementById('noteInput').value || (type==='sale'?'بيع':'شراء'),
             time: new Date().toLocaleString('ar-SA')
         });
         updateUI();
+        document.getElementById('amountInput').value = '';
+        document.getElementById('noteInput').value = '';
     }
 
     function updateUI() {
-        localStorage.setItem('farmData', JSON.stringify(state.logs));
+        localStorage.setItem('farmDataV2', JSON.stringify(state.logs));
         let t = { "زايد": 0, "زياد": 0, "عبدالعزيز": 0, exp: 0, sales: 0 };
+        
         state.logs.forEach(l => {
             if(l.type === 'exp') { t[l.who] += l.val; t.exp += l.val; } 
             else { t.sales += l.val; }
         });
 
+        const net = t.sales - t.exp;
+        const shareExp = t.exp / 3;
+        const shareSale = t.sales / 3;
+
         document.getElementById('partnersContainer').innerHTML = ["زايد", "زياد", "عبدالعزيز"].map(n => {
-            const bal = t[n] - (t.exp/3);
-            return `<div class="card"><h3>${n}</h3><div style="display:flex; justify-content:space-between"><span>دفع:</span><b>${t[n]}</b></div>
-            <div style="margin-top:10px; color:${bal>=0?'#27ae60':'#e74c3c'}"><b>${bal>=0?'له:':'عليه:'} ${Math.abs(bal).toFixed(2)} ريال</b></div></div>`;
+            // المعادلة: (ما دفعه الشخص) - (نصيبه من المصاريف) + (نصيبه من المبيعات)
+            const finalBalance = (t[n] - shareExp) + shareSale;
+            const isGain = finalBalance >= 0;
+
+            return `<div class="card">
+                <h3><i class="fas fa-user-circle"></i> ${n}</h3>
+                <div style="display:flex; justify-content:space-between; font-size:0.9rem;"><span>دفع للمشروع:</span><b>${t[n].toFixed(0)}</b></div>
+                <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-top:5px;"><span>حصته من البيع:</span><b style="color:var(--success)">+${shareSale.toFixed(0)}</b></div>
+                <div class="final-result ${isGain?'bg-win':'bg-loss'}">
+                    ${isGain ? 'يستحق استلام:' : 'مطلوب منه دفع:'} <br>
+                    <span style="font-size:1.4rem">${Math.abs(finalBalance).toFixed(2)} ريال</span>
+                </div>
+            </div>`;
         }).join('');
 
-        document.getElementById('totalExp').innerText = t.exp;
-        document.getElementById('totalSales').innerText = t.sales;
+        document.getElementById('totalExp').innerText = t.exp.toFixed(0);
+        document.getElementById('totalSales').innerText = t.sales.toFixed(0);
+        document.getElementById('netProfit').innerText = net.toFixed(0) + " ريال";
         document.getElementById('managerFee').innerText = (t.sales * 0.1).toFixed(2) + " ريال";
-        const growth = t.exp > 0 ? ((t.sales - t.exp) / t.exp * 100) : 0;
-        document.getElementById('growthRate').innerText = growth.toFixed(1) + "%";
-        document.getElementById('netProfit').innerText = `الصافي: ${t.sales - t.exp} ريال`;
+        const growth = t.exp > 0 ? (net / t.exp * 100) : 0;
+        document.getElementById('growthRate').innerText = "نسبة النمو: " + growth.toFixed(1) + "%";
 
         document.getElementById('modalLog').innerHTML = state.logs.map(l => `
             <div class="history-item" style="border-right-color:${colors[l.cat]}">
-                <div><span class="cat-badge" style="background:${colors[l.cat]}">${l.cat}</span> <b>${l.val} ريال</b> - ${l.who}</div>
+                <div><span class="cat-badge" style="background:${colors[l.cat]}">${l.cat}</span> <b>${l.val} ريال</b><br><small>${l.who} | ${l.time}</small></div>
                 <i class="fas fa-trash-alt" style="color:red; cursor:pointer" onclick="deleteItem(${l.id})"></i>
             </div>`).join('');
     }
 
-    function deleteItem(id) { if(confirm("حذف؟")) { state.logs = state.logs.filter(l => l.id !== id); updateUI(); } }
+    function deleteItem(id) { if(confirm("حذف العملية؟")) { state.logs = state.logs.filter(l => l.id !== id); updateUI(); } }
     function openModal() { document.getElementById('logModal').style.display = "block"; }
     function closeModal() { document.getElementById('logModal').style.display = "none"; }
-
-    // وظائف قاعدة البيانات
     function downloadBackup() {
-        const data = JSON.stringify(state.logs);
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = `نسخة_احتياطية_الحلال_${new Date().toLocaleDateString()}.json`;
-        a.click();
+        const blob = new Blob([JSON.stringify(state.logs)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `حسابات_الحلال_${new Date().toLocaleDateString()}.json`; a.click();
     }
-
     function importBackup(e) {
-        const file = e.target.files[0];
         const reader = new FileReader();
-        reader.onload = function(e) {
-            state.logs = JSON.parse(e.target.result);
-            updateUI();
-            alert("تم استرداد البيانات بنجاح!");
-        };
-        reader.readAsText(file);
+        reader.onload = (ev) => { state.logs = JSON.parse(ev.target.result); updateUI(); alert("تم الاسترداد!"); };
+        reader.readAsText(e.target.files[0]);
     }
-
     function exportToExcel() {
-        let csv = "\uFEFFالبيان,المبلغ,الشخص/النوع,التاريخ\n";
+        let csv = "\uFEFFالبيان,المبلغ,الطرف,التاريخ\n";
         state.logs.forEach(l => { csv += `${l.note},${l.val},${l.who},${l.time}\n`; });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "سجل_حسابات_المشروع.csv";
-        link.click();
+        const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); link.download = "كشف_حساب_المشروع.csv"; link.click();
     }
-
     updateUI();
 </script>
 </body>
