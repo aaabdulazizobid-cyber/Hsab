@@ -1,81 +1,110 @@
-import streamlit as st
-import pandas as pd
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الشراكة - 15% للمدير</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background-color: #27ae60; color: white; font-weight: bold; cursor: pointer; border: none; }
+        button:hover { background-color: #219150; }
+        .result-box { margin-top: 20px; padding: 15px; background: #e8f6f3; border-radius: 8px; text-align: right; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #2c3e50; color: white; }
+    </style>
+</head>
+<body>
 
-# إعدادات الصفحة
-st.set_page_config(page_title="نظام إدارة شراكة المشروع", layout="wide")
+<div class="container">
+    <h2>📊 إدارة مصاريف ومبيعات الشراكة</h2>
+    <p style="color: #666;">(3 شركاء - نسبة المدير 15% من المبيعات)</p>
 
-st.title("📊 نظام ضبط المصاريف وتوزيع الأرباح")
-st.info("إدارة الشراكة بين 3 أشخاص - نسبة المدير 15% من المبيعات")
+    <hr>
 
-# أسماء الشركاء
-partners = ["الشريك 1", "الشريك 2", "الشريك 3"]
-manager = "الشريك 1"  # افترضنا أنك الشريك الأول
+    <h3>🛒 إضافة مصروف</h3>
+    <select id="payer">
+        <option value="الشريك 1 (المدير)">الشريك 1 (المدير)</option>
+        <option value="الشريك 2">الشريك 2</option>
+        <option value="الشريك 3">الشريك 3</option>
+    </select>
+    <input type="number" id="expAmount" placeholder="المبلغ المدفوع (ريال)">
+    <input type="text" id="expNote" placeholder="بيان المصروف (مثلاً: أعلاف)">
+    <button onclick="addExpense()">تسجيل المصروف</button>
 
-# قاعدة بيانات وهمية (يمكن ربطها بـ Google Sheets لاحقاً)
-if 'expenses' not in st.session_state:
-    st.session_state.expenses = []
-if 'sales' not in st.session_state:
-    st.session_state.sales = []
+    <hr>
 
-# القسم الأول: إضافة العمليات
-col1, col2 = st.columns(2)
+    <h3>💰 تسجيل بيعة</h3>
+    <input type="number" id="saleAmount" placeholder="إجمالي قيمة البيع (ريال)">
+    <button onclick="addSale()">تسجيل البيع وحساب العمولة</button>
 
-with col1:
-    st.subheader("🛒 إضافة مصروف (فواتير، أعلاف، صيانة)")
-    payer = st.selectbox("من الذي دفع؟", partners)
-    amount = st.number_input("المبلغ المدفوع", min_value=0.0, step=1.0)
-    note = st.text_input("بيان المصروف (مثلاً: فاتورة كهرباء)")
-    if st.button("تسجيل المصروف"):
-        st.session_state.expenses.append({"الشريك": payer, "المبلغ": amount, "البيان": note})
-        st.success("تم تسجيل المصروف")
+    <div id="summary" class="result-box">
+        <h4>📈 ملخص الحسابات اللحظي:</h4>
+        <p>إجمالي المصاريف: <span id="totalExp">0</span> ريال</p>
+        <p>إجمالي المبيعات: <span id="totalSales">0</span> ريال</p>
+        <p><b>عمولة المدير (15%): <span id="managerFee" style="color: green;">0</span> ريال</b></p>
+        <p>المتبقي للتوزيع بعد العمولة: <span id="remaining">0</span> ريال</p>
+    </div>
 
-with col2:
-    st.subheader("💰 تسجيل عملية بيع")
-    sale_amount = st.number_input("إجمالي قيمة البيع", min_value=0.0, step=1.0)
-    sale_note = st.text_input("بيان البيعة")
-    if st.button("تسجيل البيع"):
-        # حساب نسبة المدير 15%
-        manager_fee = sale_amount * 0.15
-        remaining = sale_amount - manager_fee
-        st.session_state.sales.append({
-            "الإجمالي": sale_amount, 
-            "عمولة المدير (15%)": manager_fee, 
-            "المتبقي للتوزيع": remaining,
-            "البيان": sale_note
-        })
-        st.success(f"تم التسجيل. عمولتك: {manager_fee} ريال")
+    <div id="settlement" class="result-box" style="background: #fef9e7;">
+        <h4>⚖️ تسوية الشركاء (Splitwise Style):</h4>
+        <div id="details">لا توجد بيانات بعد.</div>
+    </div>
+</div>
 
-st.divider()
+<script>
+    let expenses = [];
+    let totalSales = 0;
+    let managerTotalFee = 0;
 
-# القسم الثاني: الحسابات الختامية
-st.header("📈 ملخص الحسابات")
+    function addExpense() {
+        const payer = document.getElementById('payer').value;
+        const amount = parseFloat(document.getElementById('expAmount').value);
+        if (isNaN(amount)) return alert("أدخل مبلغاً صحيحاً");
 
-df_exp = pd.DataFrame(st.session_state.expenses)
-df_sales = pd.DataFrame(st.session_state.sales)
+        expenses.push({ payer, amount });
+        updateUI();
+        document.getElementById('expAmount').value = "";
+    }
 
-if not df_exp.empty or not df_sales.empty:
-    col_a, col_b, col_c = st.columns(3)
-    
-    total_spent = df_exp['المبلغ'].sum() if not df_exp.empty else 0
-    total_sales = df_sales['الإجمالي'].sum() if not df_sales.empty else 0
-    total_fees = df_sales['عمولة المدير (15%)'].sum() if not df_sales.empty else 0
-    
-    col_a.metric("إجمالي المصاريف", f"{total_spent} ريال")
-    col_b.metric("إجمالي المبيعات", f"{total_sales} ريال")
-    col_c.metric("عمولتك المستحقة (15%)", f"{total_fees} ريال")
+    function addSale() {
+        const amount = parseFloat(document.getElementById('saleAmount').value);
+        if (isNaN(amount)) return alert("أدخل مبلغاً صحيحاً");
 
-    # حساب مديونية كل شريك (Splitwise Style)
-    st.subheader("⚖️ تسوية الشركاء (من له ومن عليه)")
-    share_per_person = total_spent / 3
-    
-    for p in partners:
-        p_spent = df_exp[df_exp['الشريك'] == p]['المبلغ'].sum() if not df_exp.empty else 0
-        balance = p_spent - share_per_person
-        
-        if balance > 0:
-            st.write(f"✅ **{p}**: دفع أكثر من حصته، يستحق استرداد: **{balance:.2f} ريال**")
-        else:
-            st.write(f"❌ **{p}**: دفع أقل من حصته، عليه دفع: **{abs(balance):.2f} ريال**")
+        totalSales += amount;
+        managerTotalFee += (amount * 0.15);
+        updateUI();
+        document.getElementById('saleAmount').value = "";
+    }
 
-else:
-    st.warning("لا توجد بيانات مسجلة بعد.")
+    function updateUI() {
+        let totalExp = expenses.reduce((sum, e) => sum + e.amount, 0);
+        document.getElementById('totalExp').innerText = totalExp.toFixed(2);
+        document.getElementById('totalSales').innerText = totalSales.toFixed(2);
+        document.getElementById('managerFee').innerText = managerTotalFee.toFixed(2);
+        document.getElementById('remaining').innerText = (totalSales - managerTotalFee).toFixed(2);
+
+        // حساب التسوية
+        const sharePerPerson = totalExp / 3;
+        let partners = ["الشريك 1 (المدير)", "الشريك 2", "الشريك 3"];
+        let html = "<ul>";
+
+        partners.forEach(p => {
+            let pSpent = expenses.filter(e => e.payer === p).reduce((sum, e) => sum + e.amount, 0);
+            let balance = pSpent - sharePerPerson;
+            if (balance >= 0) {
+                html += `<li>✅ <b>${p}</b>: يستحق استرداد <span style="color:green">${balance.toFixed(2)}</span> ريال</li>`;
+            } else {
+                html += `<li>❌ <b>${p}</b>: عليه دفع <span style="color:red">${Math.abs(balance).toFixed(2)}</span> ريال</li>`;
+            }
+        });
+        html += "</ul>";
+        document.getElementById('details').innerHTML = html;
+    }
+</script>
+
+</body>
+</html>
