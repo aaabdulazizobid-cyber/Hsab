@@ -3,202 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الشراكة الاحترافي</title>
+    <title>نظام إدارة المشروع - النسخة النهائية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #1e3a5f; /* كحلي رسمي */
-            --secondary-color: #c5a059; /* ذهبي */
-            --bg-color: #f8f9fa;
+            --primary-color: #1e3a5f;
+            --secondary-color: #c5a059;
+            --bg-color: #f4f7f9;
             --white: #ffffff;
             --danger: #e74c3c;
             --success: #27ae60;
+            --sidebar-width: 300px;
         }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; }
-        .container { max-width: 900px; margin: auto; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        header { background: var(--primary-color); color: var(--white); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        header h1 { margin: 0; font-size: 1.5rem; }
-        header p { margin: 5px 0 0; opacity: 0.8; font-size: 0.9rem; }
+        /* القائمة الجانبية للمشتريات */
+        .sidebar { width: var(--sidebar-width); background: var(--primary-color); color: white; display: flex; flex-direction: column; padding: 20px; box-shadow: 2px 0 15px rgba(0,0,0,0.2); z-index: 100; }
+        .sidebar h2 { font-size: 1.1rem; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+        .purchase-list { flex: 1; overflow-y: auto; padding-left: 5px; }
+        .purchase-item { background: rgba(255,255,255,0.08); padding: 12px; border-radius: 10px; margin-bottom: 12px; border-right: 4px solid var(--secondary-color); position: relative; }
+        .purchase-item b { color: var(--secondary-color); font-size: 1rem; }
+        .purchase-item small { display: block; margin-top: 5px; opacity: 0.7; font-size: 0.75rem; }
 
-        /* الجزء العلوي: بطاقات الشركاء */
-        .partners-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .partner-card { background: var(--white); padding: 15px; border-radius: 12px; border-right: 5px solid var(--secondary-color); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .partner-card h3 { margin: 0 0 10px 0; color: var(--primary-color); border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; }
-        .status-badge { padding: 4px 8px; border-radius: 5px; font-weight: bold; font-size: 0.85rem; }
-        .is-plus { background: #d4edda; color: var(--success); }
-        .is-minus { background: #f8d7da; color: var(--danger); }
+        /* المحتوى الرئيسي */
+        .main-content { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        header { background: var(--white); padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        header h1 { margin: 0; font-size: 1.4rem; color: var(--primary-color); }
 
-        /* الجزء السفلي: الحسابات والمدخلات */
-        .bottom-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 600px) { .bottom-section { grid-template-columns: 1fr; } }
+        /* شبكة الأسماء */
+        .partners-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.3s; border-top: 5px solid var(--secondary-color); }
+        .card h3 { margin: 0 0 15px 0; color: var(--primary-color); font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
         
-        .panel { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .panel h3 { margin-top: 0; color: var(--primary-color); font-size: 1.1rem; border-bottom: 2px solid var(--secondary-color); display: inline-block; padding-bottom: 5px; }
+        .stat-line { display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center; }
+        .badge { padding: 5px 12px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; }
+        .plus { background: #e8f5e9; color: var(--success); }
+        .minus { background: #ffebee; color: var(--danger); }
 
-        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9rem; }
-        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        /* لوحة التحكم */
+        .control-panel { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 25px; }
+        @media (max-width: 900px) { .control-panel { grid-template-columns: 1fr; } body { flex-direction: column; overflow: auto; } .sidebar { width: 100%; height: 350px; } }
         
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.3s; }
-        .btn-exp { background: var(--primary-color); color: white; }
-        .btn-sale { background: var(--secondary-color); color: white; }
+        .panel-box { background: var(--white); padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .panel-box h3 { margin-top: 0; color: var(--primary-color); margin-bottom: 20px; border-right: 4px solid var(--secondary-color); padding-right: 10px; }
+        
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #444; }
+        select, input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px; font-size: 1rem; }
+        
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1.1rem; transition: 0.3s; color: white; }
+        .btn-blue { background: var(--primary-color); }
+        .btn-gold { background: var(--secondary-color); }
         .btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
-        /* لوحة النتائج */
-        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .res-box { background: #f1f4f8; padding: 10px; border-radius: 8px; text-align: center; }
-        .res-box span { display: block; font-weight: bold; font-size: 1.2rem; color: var(--primary-color); }
-        .res-box label { margin: 0; font-size: 0.75rem; color: #666; }
-        .manager-special { background: #fff4e5; border: 1px solid var(--secondary-color); grid-column: span 2; }
+        .summary-stats { background: var(--primary-color); color: white; padding: 20px; border-radius: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: center; }
+        .sum-val { font-size: 1.5rem; font-weight: bold; color: var(--secondary-color); display: block; }
+        .manager-card { grid-column: span 2; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1><i class="fas fa-handshake"></i> نظام إدارة الشراكة الذكي</h1>
-        <p>ضبط المصاريف | مبيعات | عمولة المدير 15%</p>
-    </header>
-
-    <div class="partners-section" id="partnersCards">
+    <div class="sidebar">
+        <h2><i class="fas fa-history"></i> سجل العمليات المباشر</h2>
+        <div class="purchase-list" id="logsContainer">
+            <p style="text-align: center; opacity: 0.5;">لا توجد سجلات حالياً</p>
         </div>
+    </div>
 
-    <div class="bottom-section">
-        <div class="panel">
-            <h3><i class="fas fa-plus-circle"></i> إضافة عمليات</h3>
-            
-            <label>نوع العملية</label>
-            <select id="opType" onchange="toggleInputs()">
-                <option value="expense">صرف (دفع مبالغ)</option>
-                <option value="sale">بيع (دخل جديد)</option>
-            </select>
+    <div class="main-content">
+        <header>
+            <h1>نظام إدارة الحسابات والشركاء</h1>
+            <div style="background: #f8f9fa; padding: 8px 15px; border-radius: 10px; font-weight: bold; color: var(--primary-color);">
+                عمولة المدير: 10%
+            </div>
+        </header>
 
-            <div id="expenseInputs">
-                <label>من الشريك الدافع؟</label>
-                <select id="payer">
-                    <option value="الشريك 1">الشريك 1 (أنت)</option>
-                    <option value="الشريك 2">الشريك 2</option>
-                    <option value="الشريك 3">الشريك 3</option>
+        <div class="partners-grid" id="partnersContainer"></div>
+
+        <div class="control-panel">
+            <div class="panel-box">
+                <h3><i class="fas fa-plus-circle"></i> إضافة عملية جديدة</h3>
+                <label>نوع العملية</label>
+                <select id="opType" onchange="adjustForm()">
+                    <option value="exp">مصروف (شراء أغراض / تكاليف)</option>
+                    <option value="sale">بيع (دخل للمشروع)</option>
                 </select>
+
+                <div id="payerDiv">
+                    <label>من الذي قام بالدفع؟</label>
+                    <select id="personName">
+                        <option value="زايد">زايد</option>
+                        <option value="زياد">زياد</option>
+                        <option value="عبدالعزيز">عبدالعزيز</option>
+                    </select>
+                </div>
+
+                <label>المبلغ (بالريال)</label>
+                <input type="number" id="amountInput" placeholder="0.00">
+                
+                <label>البيان (اختياري)</label>
+                <input type="text" id="noteInput" placeholder="مثلاً: علف، ديزل، بيع خروف..">
+                
+                <button id="submitBtn" class="btn btn-blue" onclick="saveEntry()">تسجيل العملية</button>
             </div>
 
-            <label>المبلغ (ريال)</label>
-            <input type="number" id="amount" placeholder="0.00">
-
-            <label>البيان / الملاحظة</label>
-            <input type="text" id="note" placeholder="مثلاً: دفعة أعلاف / بيع خروف">
-
-            <button id="mainBtn" class="btn btn-exp" onclick="processEntry()">تسجيل العملية</button>
-        </div>
-
-        <div class="panel">
-            <h3><i class="fas fa-chart-line"></i> الحسابات الختامية</h3>
-            <div class="results-grid">
-                <div class="res-box"><label>إجمالي المصاريف</label><span id="totalExp">0</span></div>
-                <div class="res-box"><label>إجمالي المبيعات</label><span id="totalSales">0</span></div>
-                <div class="res-box manager-special">
-                    <label>عمولة المدير (15%)</label>
-                    <span id="managerFee" style="color: #b48a3d;">0 ريال</span>
-                </div>
-                <div class="res-box" style="grid-column: span 2;">
-                    <label>الصافي القابل للتوزيع بعد العمولة</label>
-                    <span id="remaining">0</span>
+            <div class="panel-box">
+                <h3><i class="fas fa-chart-bar"></i> الخلاصة المالية</h3>
+                <div class="summary-stats">
+                    <div><label style="color:white">إجمالي المصاريف</label><span class="sum-val" id="totalExpDisplay">0</span></div>
+                    <div><label style="color:white">إجمالي المبيعات</label><span class="sum-val" id="totalSalesDisplay">0</span></div>
+                    <div class="manager-card">
+                        <label style="color:white">عمولة المدير الصافية (10%)</label>
+                        <span class="sum-val" id="feeDisplay" style="font-size: 2rem;">0 ريال</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 <script>
-    let data = {
-        partners: {
-            "الشريك 1": { spent: 0, balance: 0 },
-            "الشريك 2": { spent: 0, balance: 0 },
-            "الشريك 3": { spent: 0, balance: 0 }
+    let appState = {
+        people: {
+            "زايد": { paid: 0, balance: 0 },
+            "زياد": { paid: 0, balance: 0 },
+            "عبدالعزيز": { paid: 0, balance: 0 }
         },
+        totalExpenses: 0,
         totalSales: 0,
-        managerFee: 0,
-        totalExpenses: 0
+        fee: 0,
+        history: []
     };
 
-    function toggleInputs() {
+    function adjustForm() {
+        const isSale = document.getElementById('opType').value === 'sale';
+        document.getElementById('payerDiv').style.display = isSale ? 'none' : 'block';
+        const btn = document.getElementById('submitBtn');
+        btn.innerText = isSale ? 'تسجيل عملية بيع' : 'تسجيل مصروف';
+        btn.className = isSale ? 'btn btn-gold' : 'btn btn-blue';
+    }
+
+    function saveEntry() {
         const type = document.getElementById('opType').value;
-        const expInput = document.getElementById('expenseInputs');
-        const btn = document.getElementById('mainBtn');
-        if (type === 'sale') {
-            expInput.style.display = 'none';
-            btn.className = 'btn btn-sale';
-            btn.innerText = 'تسجيل بيعة جديدة';
+        const amt = parseFloat(document.getElementById('amountInput').value);
+        const note = document.getElementById('noteInput').value || (type === 'sale' ? 'عملية بيع' : 'مصروف');
+        
+        if (!amt || amt <= 0) return alert("الرجاء إدخال مبلغ صحيح");
+
+        const timeNow = new Date().toLocaleString('ar-SA', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' });
+
+        if (type === 'exp') {
+            const name = document.getElementById('personName').value;
+            appState.people[name].paid += amt;
+            appState.totalExpenses += amt;
+            appState.history.unshift({ title: note, who: name, val: amt, time: timeNow, type: 'exp' });
         } else {
-            expInput.style.display = 'block';
-            btn.className = 'btn btn-exp';
-            btn.innerText = 'تسجيل مصروف';
-        }
-    }
-
-    function processEntry() {
-        const type = document.getElementById('opType').value;
-        const amt = parseFloat(document.getElementById('amount').value);
-        if (!amt || amt <= 0) return alert("أدخل مبلغاً صحيحاً");
-
-        if (type === 'expense') {
-            const payer = document.getElementById('payer').value;
-            data.partners[payer].spent += amt;
-            data.totalExpenses += amt;
-        } else {
-            data.totalSales += amt;
-            data.managerFee += (amt * 0.15);
+            appState.totalSales += amt;
+            appState.fee += (amt * 0.10); // 10% للمدير
+            appState.history.unshift({ title: note, who: 'مبيعات', val: amt, time: timeNow, type: 'sale' });
         }
 
-        calculateSettlement();
-        updateUI();
-        document.getElementById('amount').value = '';
-        document.getElementById('note').value = '';
+        refreshUI();
+        document.getElementById('amountInput').value = '';
+        document.getElementById('noteInput').value = '';
     }
 
-    function calculateSettlement() {
-        const share = data.totalExpenses / 3;
-        for (let p in data.partners) {
-            data.partners[p].balance = data.partners[p].spent - share;
-        }
-    }
-
-    function updateUI() {
-        // تحديث أرقام الملخص
-        document.getElementById('totalExp').innerText = data.totalExpenses.toFixed(2);
-        document.getElementById('totalSales').innerText = data.totalSales.toFixed(2);
-        document.getElementById('managerFee').innerText = data.managerFee.toFixed(2);
-        document.getElementById('remaining').innerText = (data.totalSales - data.managerFee).toFixed(2);
-
-        // تحديث بطاقات الشركاء
-        let cardsHtml = '';
-        for (let p in data.partners) {
-            let b = data.partners[p].balance;
-            let statusClass = b >= 0 ? 'is-plus' : 'is-minus';
-            let statusText = b >= 0 ? 'يستحق استرداد' : 'مطلوب منه دفع';
-            
-            cardsHtml += `
-                <div class="partner-card">
-                    <h3>${p}</h3>
-                    <div class="stat-row"><label>ما دفعه:</label> <b>${data.partners[p].spent.toFixed(2)}</b></div>
-                    <div class="stat-row">
-                        <label>الحالة:</label>
-                        <span class="status-badge ${statusClass}">${statusText}</span>
+    function refreshUI() {
+        const sharePerHead = appState.totalExpenses / 3;
+        
+        // تحديث البطاقات بأسماء الأشخاص
+        let htmlCards = '';
+        for (let name in appState.people) {
+            const bal = appState.people[name].paid - sharePerHead;
+            htmlCards += `
+                <div class="card">
+                    <h3><i class="fas fa-user-circle"></i> ${name}</h3>
+                    <div class="stat-line"><span>إجمالي ما دفعه:</span> <b>${appState.people[name].paid.toFixed(2)}</b></div>
+                    <div class="stat-line">
+                        <span>الحالة الآن:</span>
+                        <span class="badge ${bal>=0?'plus':'minus'}">${bal>=0?'يستحق استرداد':'مطلوب منه دفع'}</span>
                     </div>
-                    <div class="stat-row" style="margin-top:10px; font-size:1.1rem;">
-                        <label>المبلغ:</label> <b>${Math.abs(b).toFixed(2)} ريال</b>
+                    <div class="stat-line" style="margin-top:15px; border-top: 1px dashed #eee; padding-top:10px;">
+                        <span>المبلغ المستحق:</span> <b style="font-size:1.3rem; color:var(--primary-color)">${Math.abs(bal).toFixed(2)} ريال</b>
                     </div>
                 </div>
             `;
         }
-        document.getElementById('partnersCards').innerHTML = cardsHtml;
+        document.getElementById('partnersContainer').innerHTML = htmlCards;
+
+        // تحديث الأرقام الكلية
+        document.getElementById('totalExpDisplay').innerText = appState.totalExpenses.toFixed(0);
+        document.getElementById('totalSalesDisplay').innerText = appState.totalSales.toFixed(0);
+        document.getElementById('feeDisplay').innerText = appState.fee.toFixed(2) + " ريال";
+
+        // تحديث سجل المشتريات والمبيعات الجانبي
+        document.getElementById('logsContainer').innerHTML = appState.history.map(item => `
+            <div class="purchase-item" style="border-right-color: ${item.type==='exp'?'#c5a059':'#27ae60'}">
+                <b>${item.val} ريال</b> - ${item.title}
+                <small>${item.who} | ${item.time}</small>
+            </div>
+        `).join('') || '<p style="text-align: center; opacity: 0.5;">لا توجد سجلات</p>';
     }
 
-    // تشغيل مبدئي
-    updateUI();
+    // تشغيل مبدئي للتصميم
+    refreshUI();
 </script>
-
 </body>
 </html>
