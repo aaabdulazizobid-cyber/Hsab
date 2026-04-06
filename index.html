@@ -18,13 +18,10 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 15px; }
         .container { max-width: 1000px; margin: auto; }
 
-        /* الهيدر وزر السجل */
         header { background: var(--primary-color); color: white; padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         header h1 { margin: 0; font-size: 1.3rem; }
         .btn-log-toggle { background: var(--secondary-color); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-log-toggle:hover { background: #b08d4a; }
 
-        /* شبكة الأسماء */
         .partners-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .card { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--secondary-color); }
         .card h3 { margin: 0 0 15px 0; color: var(--primary-color); display: flex; align-items: center; gap: 8px; }
@@ -33,7 +30,6 @@
         .plus { background: #e8f5e9; color: var(--success); }
         .minus { background: #ffebee; color: var(--danger); }
 
-        /* لوحة التحكم */
         .control-panel { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px; }
         @media (max-width: 800px) { .control-panel { grid-template-columns: 1fr; } }
         .panel-box { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
@@ -45,19 +41,19 @@
         .bg-blue { background: var(--primary-color); }
         .bg-gold { background: var(--secondary-color); }
 
-        /* الخلاصة المالية */
         .summary-stats { background: var(--primary-color); color: white; padding: 20px; border-radius: 15px; text-align: center; }
         .sum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .sum-val { font-size: 1.4rem; font-weight: bold; color: var(--secondary-color); }
 
-        /* النافذة المنبثقة (Modal) */
+        /* النافذة المنبثقة للسجل مع ميزة الحذف */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
         .modal-content { background: var(--white); margin: 5% auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 500px; height: 70vh; display: flex; flex-direction: column; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         .close-btn { font-size: 25px; cursor: pointer; color: #888; }
         .history-list { flex: 1; overflow-y: auto; margin-top: 15px; }
-        .history-item { background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-right: 4px solid var(--secondary-color); }
-        .history-item small { display: block; color: #777; margin-top: 5px; }
+        .history-item { background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-right: 4px solid var(--secondary-color); display: flex; justify-content: space-between; align-items: center; }
+        .item-details { flex: 1; }
+        .delete-btn { color: var(--danger); cursor: pointer; padding: 10px; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -76,7 +72,7 @@
             <label>النوع</label>
             <select id="opType" onchange="adjustUI()">
                 <option value="exp">مصروف (شراء)</option>
-                <option value="sale">بيع (دخل)</option>
+                <option value="sale">بيع (دخل للمشروع)</option>
             </select>
             <div id="payerDiv">
                 <label>من دفع؟</label>
@@ -86,7 +82,7 @@
                     <option value="عبدالعزيز">عبدالعزيز</option>
                 </select>
             </div>
-            <label>المبلغ</label>
+            <label>المبلغ (ريال)</label>
             <input type="number" id="amountInput" placeholder="0.00">
             <label>البيان</label>
             <input type="text" id="noteInput" placeholder="مثلاً: علف، بيع طلي..">
@@ -95,11 +91,11 @@
 
         <div class="summary-stats">
             <div class="sum-grid">
-                <div><label>المصاريف</label><span class="sum-val" id="totalExp">0</span></div>
-                <div><label>المبيعات</label><span class="sum-val" id="totalSales">0</span></div>
+                <div><label>إجمالي المصاريف</label><span class="sum-val" id="totalExp">0</span></div>
+                <div><label>إجمالي المبيعات</label><span class="sum-val" id="totalSales">0</span></div>
             </div>
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                <label>عمولة المدير (10%)</label>
+                <label>عمولة المدير الصافية (10%)</label>
                 <span class="sum-val" id="managerFee" style="font-size: 1.8rem;">0 ريال</span>
             </div>
         </div>
@@ -112,17 +108,12 @@
             <h3><i class="fas fa-history"></i> سجل العمليات المكتملة</h3>
             <span class="close-btn" onclick="closeModal()">&times;</span>
         </div>
-        <div class="history-list" id="modalLog">
-            <p style="text-align: center; opacity: 0.5; margin-top: 50px;">السجل فارغ</p>
-        </div>
+        <div class="history-list" id="modalLog"></div>
     </div>
 </div>
 
 <script>
-    let state = {
-        users: { "زايد": 0, "زياد": 0, "عبدالعزيز": 0 },
-        totalExp: 0, totalSales: 0, fee: 0, logs: []
-    };
+    let state = { logs: [] };
 
     function adjustUI() {
         const isSale = document.getElementById('opType').value === 'sale';
@@ -141,45 +132,60 @@
         if (!amt || amt <= 0) return alert("أدخل مبلغاً صحيحاً");
 
         const time = new Date().toLocaleString('ar-SA', {hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'});
+        const id = Date.now(); // معرف فريد للحذف
 
-        if (type === 'exp') {
-            const name = document.getElementById('personName').value;
-            state.users[name] += amt;
-            state.totalExp += amt;
-            state.logs.unshift({ note, who: name, val: amt, time, color: '#c5a059' });
-        } else {
-            state.totalSales += amt;
-            state.fee += (amt * 0.10);
-            state.logs.unshift({ note, who: 'مبيعات', val: amt, time, color: '#27ae60' });
-        }
+        state.logs.unshift({ id, note, who: type === 'exp' ? document.getElementById('personName').value : 'مبيعات', val: amt, time, type });
         updateUI();
         document.getElementById('amountInput').value = '';
         document.getElementById('noteInput').value = '';
     }
 
+    function deleteEntry(id) {
+        if(confirm("هل أنت متأكد من حذف هذه العملية؟")) {
+            state.logs = state.logs.filter(l => l.id !== id);
+            updateUI();
+        }
+    }
+
     function updateUI() {
-        const share = state.totalExp / 3;
+        let totals = { "زايد": 0, "زياد": 0, "عبدالعزيز": 0, exp: 0, sales: 0, fee: 0 };
+        
+        state.logs.forEach(l => {
+            if(l.type === 'exp') {
+                totals[l.who] += l.val;
+                totals.exp += l.val;
+            } else {
+                totals.sales += l.val;
+                totals.fee += (l.val * 0.10);
+            }
+        });
+
+        const share = totals.exp / 3;
         let html = '';
-        for (let name in state.users) {
-            const bal = state.users[name] - share;
+        ["زايد", "زياد", "عبدالعزيز"].forEach(name => {
+            const bal = totals[name] - share;
             html += `<div class="card">
                 <h3><i class="fas fa-user"></i> ${name}</h3>
-                <div class="stat-line"><span>دفع:</span> <b>${state.users[name].toFixed(2)}</b></div>
+                <div class="stat-line"><span>دفع:</span> <b>${totals[name].toFixed(2)}</b></div>
                 <div class="stat-line"><span>الحالة:</span> <span class="badge ${bal>=0?'plus':'minus'}">${bal>=0?'استرداد':'مطلوب'}</span></div>
                 <div class="stat-line" style="margin-top:10px; border-top:1px dashed #eee; padding-top:10px;">
                     <span>المبلغ:</span> <b style="font-size:1.2rem; color:var(--primary-color)">${Math.abs(bal).toFixed(2)} ريال</b>
                 </div>
             </div>`;
-        }
+        });
+
         document.getElementById('partnersContainer').innerHTML = html;
-        document.getElementById('totalExp').innerText = state.totalExp.toFixed(0);
-        document.getElementById('totalSales').innerText = state.totalSales.toFixed(0);
-        document.getElementById('managerFee').innerText = state.fee.toFixed(2) + " ريال";
+        document.getElementById('totalExp').innerText = totals.exp.toFixed(0);
+        document.getElementById('totalSales').innerText = totals.sales.toFixed(0);
+        document.getElementById('managerFee').innerText = totals.fee.toFixed(2) + " ريال";
 
         document.getElementById('modalLog').innerHTML = state.logs.map(l => `
-            <div class="history-item" style="border-right-color: ${l.color}">
-                <b>${l.val} ريال</b> - ${l.note}
-                <small>${l.who} | ${l.time}</small>
+            <div class="history-item" style="border-right-color: ${l.type==='exp'?'#c5a059':'#27ae60'}">
+                <div class="item-details">
+                    <b>${l.val} ريال</b> - ${l.note}
+                    <small>${l.who} | ${l.time}</small>
+                </div>
+                <i class="fas fa-trash-alt delete-btn" onclick="deleteEntry(${l.id})"></i>
             </div>`).join('') || '<p style="text-align:center; opacity:0.5; margin-top:50px;">السجل فارغ</p>';
     }
     updateUI();
