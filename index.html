@@ -36,12 +36,11 @@
         .bg-blue { background: var(--primary-color); }
         .bg-gold { background: var(--secondary-color); }
 
-        /* الخلاصة المالية ونسبة النمو */
         .summary-stats { background: var(--primary-color); color: white; padding: 20px; border-radius: 15px; }
         .growth-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-top: 15px; text-align: center; border: 1px solid var(--secondary-color); }
-        .growth-val { font-size: 2rem; font-weight: bold; color: #4ade80; }
+        .growth-val { font-size: 2rem; font-weight: bold; }
 
-        /* النوافذ المنبثقة */
+        /* النافذة المنبثقة */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
         .modal-content { background: var(--white); margin: 5% auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 550px; height: 75vh; display: flex; flex-direction: column; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
@@ -49,36 +48,42 @@
         .history-item { background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-right: 5px solid var(--secondary-color); display: flex; justify-content: space-between; align-items: center; }
         
         .cat-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 5px; color: white; margin-right: 5px; }
-        .cat-feed { background: #e67e22; } /* علف */
-        .cat-med { background: #9b59b6; } /* أدوية */
-        .cat-fence { background: #34495e; } /* شبوك */
-        .cat-other { background: #95a5a6; } /* أخرى */
-        .cat-sale { background: var(--success); } /* بيع */
+        .cat-feed { background: #e67e22; }
+        .cat-med { background: #9b59b6; }
+        .cat-fence { background: #34495e; }
+        .cat-other { background: #95a5a6; }
+        .cat-sale { background: var(--success); }
 
-        .percentage-info { font-size: 0.85rem; color: var(--secondary-color); font-weight: bold; }
+        /* شريط النسبة المئوية للمصاريف */
+        .expense-analysis { margin-top: 15px; padding: 10px; background: #f0f4f8; border-radius: 10px; }
+        .progress-bar { height: 12px; display: flex; border-radius: 10px; overflow: hidden; margin: 10px 0; background: #ddd; }
+        .progress-segment { height: 100%; }
+        .legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .dot { height: 10px; width: 10px; border-radius: 50%; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>نظام إدارة الحسابات (زايد، زياد، عبدالعزيز)</h1>
-        <button class="btn-log-toggle" onclick="openModal()"><i class="fas fa-chart-pie"></i> سجل العمليات والمصاريف</button>
+        <h1>نظام حسابات (زايد، زياد، عبدالعزيز)</h1>
+        <button class="btn-log-toggle" onclick="openModal()"><i class="fas fa-chart-pie"></i> سجل العمليات وتحليل النسب</button>
     </header>
 
     <div class="partners-grid" id="partnersContainer"></div>
 
     <div class="control-panel">
         <div class="panel-box">
-            <h3>تسجيل جديد</h3>
-            <label>نوع العملية</label>
+            <h3>تسجيل عملية</h3>
+            <label>النوع</label>
             <select id="opType" onchange="toggleCategory()">
                 <option value="exp">مصروف (شراء)</option>
-                <option value="sale">بيع (دخل جديد)</option>
+                <option value="sale">بيع (دخل)</option>
             </select>
 
             <div id="categoryDiv">
-                <label>تصنيف المصروف</label>
+                <label>نوع المصروف</label>
                 <select id="expCategory">
                     <option value="علف">علف</option>
                     <option value="أدوية">أدوية</option>
@@ -98,26 +103,26 @@
 
             <label>المبلغ (ريال)</label>
             <input type="number" id="amountInput" placeholder="0.00">
-            <label>ملاحظات</label>
-            <input type="text" id="noteInput" placeholder="وصف مختصر للعملية">
+            <label>البيان</label>
+            <input type="text" id="noteInput" placeholder="وصف العملية">
             <button id="submitBtn" class="btn-submit bg-blue" onclick="saveData()">إضافة العملية</button>
         </div>
 
         <div class="summary-stats">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center;">
-                <div><small>إجمالي المصاريف</small><div class="sum-val" id="totalExp">0</div></div>
-                <div><small>إجمالي المبيعات</small><div class="sum-val" id="totalSales">0</div></div>
+                <div><small>المصاريف</small><div class="sum-val" id="totalExpDisplay">0</div></div>
+                <div><small>المبيعات</small><div class="sum-val" id="totalSalesDisplay">0</div></div>
             </div>
             
             <div class="growth-box">
-                <label style="color: white; font-size: 0.9rem;">نسبة نمو المشروع (صافي الأرباح)</label>
-                <div class="growth-val" id="growthRate">0%</div>
-                <small id="netProfit">الصافي: 0 ريال</small>
+                <small>نسبة نمو المشروع (صافي الربح)</small>
+                <div class="growth-val" id="growthDisplay">0%</div>
+                <small id="netProfitDisplay">الصافي: 0 ريال</small>
             </div>
 
-            <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; text-align: center;">
+            <div style="margin-top:10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
                 <small>عمولة المدير (10%)</small>
-                <div class="sum-val" id="managerFee" style="color: #4ade80;">0 ريال</div>
+                <div class="sum-val" style="color: #4ade80;" id="feeDisplay">0 ريال</div>
             </div>
         </div>
     </div>
@@ -126,21 +131,29 @@
 <div id="logModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3><i class="fas fa-file-invoice-dollar"></i> تفاصيل المصاريف والمبيعات</h3>
+            <h3>تحليل المصاريف والعمليات</h3>
             <span style="cursor:pointer; font-size:24px;" onclick="closeModal()">&times;</span>
         </div>
-        <div id="categoryStats" style="margin-top:10px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
+        
+        <div class="expense-analysis" id="analysisBox" style="display:none;">
+            <label>توزيع المصاريف بنسبة المئوية:</label>
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="legend" id="legend"></div>
+        </div>
+
         <div class="history-list" id="modalLog"></div>
     </div>
 </div>
 
 <script>
     let state = { logs: [] };
+    const catColors = { "علف": "#e67e22", "أدوية": "#9b59b6", "شبوك": "#34495e", "أخرى": "#95a5a6", "بيع": "#27ae60" };
 
     function toggleCategory() {
         const isSale = document.getElementById('opType').value === 'sale';
         document.getElementById('categoryDiv').style.display = isSale ? 'none' : 'block';
         document.getElementById('payerDiv').style.display = isSale ? 'none' : 'block';
+        document.getElementById('submitBtn').innerText = isSale ? 'تسجيل بيع' : 'إضافة مصروف';
         document.getElementById('submitBtn').className = 'btn-submit ' + (isSale ? 'bg-gold' : 'bg-blue');
     }
 
@@ -151,16 +164,13 @@
         const type = document.getElementById('opType').value;
         const amt = parseFloat(document.getElementById('amountInput').value);
         const cat = type === 'exp' ? document.getElementById('expCategory').value : 'بيع';
-        const note = document.getElementById('noteInput').value || cat;
-        if (!amt || amt <= 0) return alert("يرجى إدخال مبلغ صحيح");
+        if (!amt || amt <= 0) return alert("أدخل مبلغاً صحيحاً");
 
         state.logs.unshift({
-            id: Date.now(),
-            type,
-            cat,
+            id: Date.now(), type, cat,
             who: type === 'exp' ? document.getElementById('personName').value : 'مبيعات',
-            val: amt,
-            time: new Date().toLocaleString('ar-SA', {hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'})
+            val: amt, note: document.getElementById('noteInput').value || cat,
+            time: new Date().toLocaleString('ar-SA', {hour:'2-digit', minute:'2-digit'})
         });
         updateUI();
         document.getElementById('amountInput').value = '';
@@ -168,37 +178,29 @@
     }
 
     function deleteItem(id) {
-        if(confirm("حذف هذه العملية؟")) {
-            state.logs = state.logs.filter(l => l.id !== id);
-            updateUI();
-        }
+        if(confirm("حذف؟")) { state.logs = state.logs.filter(l => l.id !== id); updateUI(); }
     }
 
     function updateUI() {
         let totals = { "زايد": 0, "زياد": 0, "عبدالعزيز": 0, exp: 0, sales: 0, catSums: {} };
-        
         state.logs.forEach(l => {
             if(l.type === 'exp') {
-                totals[l.who] += l.val;
-                totals.exp += l.val;
+                totals[l.who] += l.val; totals.exp += l.val;
                 totals.catSums[l.cat] = (totals.catSums[l.cat] || 0) + l.val;
-            } else {
-                totals.sales += l.val;
-            }
+            } else { totals.sales += l.val; }
         });
 
-        // حساب نسبة النمو (صافي الربح مقارنة بالمصاريف)
+        // تحديث الخلاصة والنمو
         const net = totals.sales - totals.exp;
         const growth = totals.exp > 0 ? (net / totals.exp * 100) : 0;
-        document.getElementById('growthRate').innerText = growth.toFixed(1) + "%";
-        document.getElementById('growthRate').style.color = net >= 0 ? "#4ade80" : "#fb7185";
-        document.getElementById('netProfit').innerText = `الصافي: ${net.toFixed(0)} ريال`;
+        document.getElementById('growthDisplay').innerText = growth.toFixed(1) + "%";
+        document.getElementById('growthDisplay').style.color = net >= 0 ? "#4ade80" : "#fb7185";
+        document.getElementById('netProfitDisplay').innerText = `الصافي: ${net.toFixed(0)} ريال`;
+        document.getElementById('totalExpDisplay').innerText = totals.exp.toFixed(0);
+        document.getElementById('totalSalesDisplay').innerText = totals.sales.toFixed(0);
+        document.getElementById('feeDisplay').innerText = (totals.sales * 0.10).toFixed(2) + " ريال";
 
-        // تحديث البطاقات والخلاصة
-        document.getElementById('totalExp').innerText = totals.exp.toFixed(0);
-        document.getElementById('totalSales').innerText = totals.sales.toFixed(0);
-        document.getElementById('managerFee').innerText = (totals.sales * 0.10).toFixed(2) + " ريال";
-
+        // تحديث بطاقات الأشخاص
         const share = totals.exp / 3;
         document.getElementById('partnersContainer').innerHTML = ["زايد", "زياد", "عبدالعزيز"].map(name => {
             const bal = totals[name] - share;
@@ -206,32 +208,33 @@
                 <h3><i class="fas fa-user-circle"></i> ${name}</h3>
                 <div style="display:flex; justify-content:space-between"><span>دفع:</span> <b>${totals[name].toFixed(0)}</b></div>
                 <div style="display:flex; justify-content:space-between; margin-top:10px">
-                    <span>${bal>=0?'له استرداد:':'عليه دفع:'}</span>
+                    <span>${bal>=0?'استرداد:':'دفع:'}</span>
                     <b style="color:${bal>=0?'#27ae60':'#e74c3c'}">${Math.abs(bal).toFixed(2)} ريال</b>
                 </div>
             </div>`;
         }).join('');
 
-        // تحديث إحصائيات التصنيفات في النافذة
-        document.getElementById('categoryStats').innerHTML = Object.keys(totals.catSums).map(c => {
-            const p = (totals.catSums[c] / totals.exp * 100).toFixed(0);
-            return `<span class="badge bg-gold" style="color:white; padding:5px 10px;">${c}: ${p}%</span>`;
-        }).join('');
+        // تحليل المصاريف (النسب المئوية)
+        if(totals.exp > 0) {
+            document.getElementById('analysisBox').style.display = "block";
+            let barHtml = '', legendHtml = '';
+            for(let cat in totals.catSums) {
+                const per = (totals.catSums[cat] / totals.exp * 100);
+                barHtml += `<div class="progress-segment" style="width:${per}%; background:${catColors[cat]}"></div>`;
+                legendHtml += `<div class="legend-item"><span class="dot" style="background:${catColors[cat]}"></span> ${cat}: ${per.toFixed(0)}%</div>`;
+            }
+            document.getElementById('progressBar').innerHTML = barHtml;
+            document.getElementById('legend').innerHTML = legendHtml;
+        } else { document.getElementById('analysisBox').style.display = "none"; }
 
-        // تحديث السجل مع الأيقونات والحذف
-        document.getElementById('modalLog').innerHTML = state.logs.map(l => {
-            const catClass = l.cat === 'علف' ? 'cat-feed' : l.cat === 'أدوية' ? 'cat-med' : l.cat === 'شبوك' ? 'cat-fence' : l.cat === 'بيع' ? 'cat-sale' : 'cat-other';
-            return `<div class="history-item">
-                <div>
-                    <span class="cat-badge ${catClass}">${l.cat}</span>
-                    <b>${l.val} ريال</b> <small>(${l.who})</small>
-                    <div style="font-size:0.8rem; color:#888;">${l.note} | ${l.time}</div>
-                </div>
+        // السجل
+        document.getElementById('modalLog').innerHTML = state.logs.map(l => `
+            <div class="history-item" style="border-right-color: ${catColors[l.cat]}">
+                <div><span class="cat-badge" style="background:${catColors[l.cat]}">${l.cat}</span> <b>${l.val}</b> <small>(${l.who})</small>
+                <div style="font-size:0.75rem; color:#888;">${l.note} | ${l.time}</div></div>
                 <i class="fas fa-trash-alt" style="color:#e74c3c; cursor:pointer;" onclick="deleteItem(${l.id})"></i>
-            </div>`;
-        }).join('');
+            </div>`).join('') || '<p style="text-align:center; opacity:0.5; margin-top:30px;">لا يوجد سجل</p>';
     }
-    updateUI();
 </script>
 </body>
 </html>
