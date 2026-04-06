@@ -3,72 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الحسابات المتطور</title>
+    <title>نظام إدارة الحلال - النسخة الاحترافية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #1e3a5f;
-            --secondary-color: #c5a059;
-            --bg-color: #f4f7f9;
-            --white: #ffffff;
-            --danger: #e74c3c;
-            --success: #27ae60;
-        }
-
+        :root { --primary-color: #1e3a5f; --secondary-color: #c5a059; --bg-color: #f4f7f9; --white: #ffffff; --danger: #e74c3c; --success: #27ae60; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 15px; }
         .container { max-width: 1100px; margin: auto; }
-
         header { background: var(--primary-color); color: white; padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        header h1 { margin: 0; font-size: 1.3rem; }
-        .btn-log-toggle { background: var(--secondary-color); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
+        .btn-action { background: var(--secondary-color); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-right: 5px; font-size: 0.85rem; }
         .partners-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .card { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--secondary-color); }
-        
         .control-panel { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px; }
         @media (max-width: 800px) { .control-panel { grid-template-columns: 1fr; } }
-        
         .panel-box { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
         select, input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px; box-sizing: border-box; }
-        
-        .btn-submit { width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; font-size: 1rem; transition: 0.3s; }
-        .bg-blue { background: var(--primary-color); }
-        .bg-gold { background: var(--secondary-color); }
-
+        .btn-submit { width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; font-size: 1rem; }
         .summary-stats { background: var(--primary-color); color: white; padding: 20px; border-radius: 15px; }
         .growth-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-top: 15px; text-align: center; border: 1px solid var(--secondary-color); }
-        .growth-val { font-size: 2rem; font-weight: bold; }
-
-        /* النافذة المنبثقة */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
-        .modal-content { background: var(--white); margin: 5% auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 550px; height: 75vh; display: flex; flex-direction: column; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .modal-content { background: var(--white); margin: 5% auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 550px; height: 80vh; display: flex; flex-direction: column; }
         .history-list { flex: 1; overflow-y: auto; margin-top: 15px; }
         .history-item { background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-right: 5px solid var(--secondary-color); display: flex; justify-content: space-between; align-items: center; }
-        
-        .cat-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 5px; color: white; margin-right: 5px; }
-        .cat-feed { background: #e67e22; }
-        .cat-med { background: #9b59b6; }
-        .cat-fence { background: #34495e; }
-        .cat-other { background: #95a5a6; }
-        .cat-sale { background: var(--success); }
-
-        /* شريط النسبة المئوية للمصاريف */
-        .expense-analysis { margin-top: 15px; padding: 10px; background: #f0f4f8; border-radius: 10px; }
-        .progress-bar { height: 12px; display: flex; border-radius: 10px; overflow: hidden; margin: 10px 0; background: #ddd; }
-        .progress-segment { height: 100%; }
-        .legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; }
-        .legend-item { display: flex; align-items: center; gap: 5px; }
-        .dot { height: 10px; width: 10px; border-radius: 50%; }
+        .cat-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 5px; color: white; }
+        .data-management { margin-top: 15px; padding: 15px; background: #eee; border-radius: 10px; display: flex; gap: 10px; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>نظام حسابات (زايد، زياد، عبدالعزيز)</h1>
-        <button class="btn-log-toggle" onclick="openModal()"><i class="fas fa-chart-pie"></i> سجل العمليات وتحليل النسب</button>
+        <h1>نظام حسابات الحلال</h1>
+        <div>
+            <button class="btn-action" onclick="openModal()"><i class="fas fa-chart-pie"></i> السجل والتحليل</button>
+            <button class="btn-action" style="background:#27ae60" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> تصدير إكسل</button>
+        </div>
     </header>
 
     <div class="partners-grid" id="partnersContainer"></div>
@@ -76,53 +45,32 @@
     <div class="control-panel">
         <div class="panel-box">
             <h3>تسجيل عملية</h3>
-            <label>النوع</label>
             <select id="opType" onchange="toggleCategory()">
                 <option value="exp">مصروف (شراء)</option>
                 <option value="sale">بيع (دخل)</option>
             </select>
-
-            <div id="categoryDiv">
-                <label>نوع المصروف</label>
-                <select id="expCategory">
-                    <option value="علف">علف</option>
-                    <option value="أدوية">أدوية</option>
-                    <option value="شبوك">شبوك</option>
-                    <option value="أخرى">أخرى</option>
-                </select>
+            <div id="categoryDiv"><label>النوع</label>
+                <select id="expCategory"><option>علف</option><option>أدوية</option><option>شبوك</option><option>أخرى</option></select>
             </div>
-
-            <div id="payerDiv">
-                <label>من دفع؟</label>
-                <select id="personName">
-                    <option value="زايد">زايد</option>
-                    <option value="زياد">زياد</option>
-                    <option value="عبدالعزيز">عبدالعزيز</option>
-                </select>
+            <div id="payerDiv"><label>من دفع؟</label>
+                <select id="personName"><option>زايد</option><option>زياد</option><option>عبدالعزيز</option></select>
             </div>
-
-            <label>المبلغ (ريال)</label>
-            <input type="number" id="amountInput" placeholder="0.00">
-            <label>البيان</label>
-            <input type="text" id="noteInput" placeholder="وصف العملية">
-            <button id="submitBtn" class="btn-submit bg-blue" onclick="saveData()">إضافة العملية</button>
+            <label>المبلغ</label><input type="number" id="amountInput" placeholder="0.00">
+            <label>البيان</label><input type="text" id="noteInput" placeholder="...">
+            <button id="submitBtn" class="btn-submit" style="background:var(--primary-color)" onclick="saveData()">إضافة العملية</button>
         </div>
 
         <div class="summary-stats">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center;">
-                <div><small>المصاريف</small><div class="sum-val" id="totalExpDisplay">0</div></div>
-                <div><small>المبيعات</small><div class="sum-val" id="totalSalesDisplay">0</div></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; text-align: center;">
+                <div><small>المصاريف</small><div id="totalExp" style="font-size:1.5rem; color:var(--secondary-color)">0</div></div>
+                <div><small>المبيعات</small><div id="totalSales" style="font-size:1.5rem; color:var(--secondary-color)">0</div></div>
             </div>
-            
             <div class="growth-box">
-                <small>نسبة نمو المشروع (صافي الربح)</small>
-                <div class="growth-val" id="growthDisplay">0%</div>
-                <small id="netProfitDisplay">الصافي: 0 ريال</small>
+                <small>نسبة النمو</small><div id="growthRate" style="font-size:2rem; font-weight:bold">0%</div>
+                <small id="netProfit">الصافي: 0 ريال</small>
             </div>
-
-            <div style="margin-top:10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <small>عمولة المدير (10%)</small>
-                <div class="sum-val" style="color: #4ade80;" id="feeDisplay">0 ريال</div>
+            <div style="text-align:center; margin-top:10px; border-top:1px solid #444; padding-top:10px;">
+                <small>عمولة المدير (10%)</small><div id="managerFee" style="color:#4ade80">0 ريال</div>
             </div>
         </div>
     </div>
@@ -130,15 +78,12 @@
 
 <div id="logModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3>تحليل المصاريف والعمليات</h3>
-            <span style="cursor:pointer; font-size:24px;" onclick="closeModal()">&times;</span>
-        </div>
+        <div style="display:flex; justify-content:space-between"><h3>قاعدة البيانات والسجلات</h3><span style="cursor:pointer; font-size:24px;" onclick="closeModal()">&times;</span></div>
         
-        <div class="expense-analysis" id="analysisBox" style="display:none;">
-            <label>توزيع المصاريف بنسبة المئوية:</label>
-            <div class="progress-bar" id="progressBar"></div>
-            <div class="legend" id="legend"></div>
+        <div class="data-management">
+            <button onclick="downloadBackup()" class="btn-action"><i class="fas fa-download"></i> حفظ نسخة احتياطية</button>
+            <button onclick="document.getElementById('fileInput').click()" class="btn-action" style="background:#34495e"><i class="fas fa-upload"></i> استرداد نسخة</button>
+            <input type="file" id="fileInput" style="display:none" onchange="importBackup(event)">
         </div>
 
         <div class="history-list" id="modalLog"></div>
@@ -146,95 +91,93 @@
 </div>
 
 <script>
-    let state = { logs: [] };
-    const catColors = { "علف": "#e67e22", "أدوية": "#9b59b6", "شبوك": "#34495e", "أخرى": "#95a5a6", "بيع": "#27ae60" };
+    let state = { logs: JSON.parse(localStorage.getItem('farmData')) || [] };
+    const colors = { "علف": "#e67e22", "أدوية": "#9b59b6", "شبوك": "#34495e", "أخرى": "#95a5a6", "بيع": "#27ae60" };
 
     function toggleCategory() {
         const isSale = document.getElementById('opType').value === 'sale';
         document.getElementById('categoryDiv').style.display = isSale ? 'none' : 'block';
         document.getElementById('payerDiv').style.display = isSale ? 'none' : 'block';
-        document.getElementById('submitBtn').innerText = isSale ? 'تسجيل بيع' : 'إضافة مصروف';
-        document.getElementById('submitBtn').className = 'btn-submit ' + (isSale ? 'bg-gold' : 'bg-blue');
     }
-
-    function openModal() { document.getElementById('logModal').style.display = "block"; }
-    function closeModal() { document.getElementById('logModal').style.display = "none"; }
 
     function saveData() {
         const type = document.getElementById('opType').value;
         const amt = parseFloat(document.getElementById('amountInput').value);
-        const cat = type === 'exp' ? document.getElementById('expCategory').value : 'بيع';
-        if (!amt || amt <= 0) return alert("أدخل مبلغاً صحيحاً");
-
+        if (!amt || amt <= 0) return alert("أدخل مبلغاً");
         state.logs.unshift({
-            id: Date.now(), type, cat,
+            id: Date.now(), type, val: amt, 
+            cat: type === 'exp' ? document.getElementById('expCategory').value : 'بيع',
             who: type === 'exp' ? document.getElementById('personName').value : 'مبيعات',
-            val: amt, note: document.getElementById('noteInput').value || cat,
-            time: new Date().toLocaleString('ar-SA', {hour:'2-digit', minute:'2-digit'})
+            note: document.getElementById('noteInput').value || '..',
+            time: new Date().toLocaleString('ar-SA')
         });
         updateUI();
-        document.getElementById('amountInput').value = '';
-        document.getElementById('noteInput').value = '';
-    }
-
-    function deleteItem(id) {
-        if(confirm("حذف؟")) { state.logs = state.logs.filter(l => l.id !== id); updateUI(); }
     }
 
     function updateUI() {
-        let totals = { "زايد": 0, "زياد": 0, "عبدالعزيز": 0, exp: 0, sales: 0, catSums: {} };
+        localStorage.setItem('farmData', JSON.stringify(state.logs));
+        let t = { "زايد": 0, "زياد": 0, "عبدالعزيز": 0, exp: 0, sales: 0 };
         state.logs.forEach(l => {
-            if(l.type === 'exp') {
-                totals[l.who] += l.val; totals.exp += l.val;
-                totals.catSums[l.cat] = (totals.catSums[l.cat] || 0) + l.val;
-            } else { totals.sales += l.val; }
+            if(l.type === 'exp') { t[l.who] += l.val; t.exp += l.val; } 
+            else { t.sales += l.val; }
         });
 
-        // تحديث الخلاصة والنمو
-        const net = totals.sales - totals.exp;
-        const growth = totals.exp > 0 ? (net / totals.exp * 100) : 0;
-        document.getElementById('growthDisplay').innerText = growth.toFixed(1) + "%";
-        document.getElementById('growthDisplay').style.color = net >= 0 ? "#4ade80" : "#fb7185";
-        document.getElementById('netProfitDisplay').innerText = `الصافي: ${net.toFixed(0)} ريال`;
-        document.getElementById('totalExpDisplay').innerText = totals.exp.toFixed(0);
-        document.getElementById('totalSalesDisplay').innerText = totals.sales.toFixed(0);
-        document.getElementById('feeDisplay').innerText = (totals.sales * 0.10).toFixed(2) + " ريال";
-
-        // تحديث بطاقات الأشخاص
-        const share = totals.exp / 3;
-        document.getElementById('partnersContainer').innerHTML = ["زايد", "زياد", "عبدالعزيز"].map(name => {
-            const bal = totals[name] - share;
-            return `<div class="card">
-                <h3><i class="fas fa-user-circle"></i> ${name}</h3>
-                <div style="display:flex; justify-content:space-between"><span>دفع:</span> <b>${totals[name].toFixed(0)}</b></div>
-                <div style="display:flex; justify-content:space-between; margin-top:10px">
-                    <span>${bal>=0?'استرداد:':'دفع:'}</span>
-                    <b style="color:${bal>=0?'#27ae60':'#e74c3c'}">${Math.abs(bal).toFixed(2)} ريال</b>
-                </div>
-            </div>`;
+        document.getElementById('partnersContainer').innerHTML = ["زايد", "زياد", "عبدالعزيز"].map(n => {
+            const bal = t[n] - (t.exp/3);
+            return `<div class="card"><h3>${n}</h3><div style="display:flex; justify-content:space-between"><span>دفع:</span><b>${t[n]}</b></div>
+            <div style="margin-top:10px; color:${bal>=0?'#27ae60':'#e74c3c'}"><b>${bal>=0?'له:':'عليه:'} ${Math.abs(bal).toFixed(2)} ريال</b></div></div>`;
         }).join('');
 
-        // تحليل المصاريف (النسب المئوية)
-        if(totals.exp > 0) {
-            document.getElementById('analysisBox').style.display = "block";
-            let barHtml = '', legendHtml = '';
-            for(let cat in totals.catSums) {
-                const per = (totals.catSums[cat] / totals.exp * 100);
-                barHtml += `<div class="progress-segment" style="width:${per}%; background:${catColors[cat]}"></div>`;
-                legendHtml += `<div class="legend-item"><span class="dot" style="background:${catColors[cat]}"></span> ${cat}: ${per.toFixed(0)}%</div>`;
-            }
-            document.getElementById('progressBar').innerHTML = barHtml;
-            document.getElementById('legend').innerHTML = legendHtml;
-        } else { document.getElementById('analysisBox').style.display = "none"; }
+        document.getElementById('totalExp').innerText = t.exp;
+        document.getElementById('totalSales').innerText = t.sales;
+        document.getElementById('managerFee').innerText = (t.sales * 0.1).toFixed(2) + " ريال";
+        const growth = t.exp > 0 ? ((t.sales - t.exp) / t.exp * 100) : 0;
+        document.getElementById('growthRate').innerText = growth.toFixed(1) + "%";
+        document.getElementById('netProfit').innerText = `الصافي: ${t.sales - t.exp} ريال`;
 
-        // السجل
         document.getElementById('modalLog').innerHTML = state.logs.map(l => `
-            <div class="history-item" style="border-right-color: ${catColors[l.cat]}">
-                <div><span class="cat-badge" style="background:${catColors[l.cat]}">${l.cat}</span> <b>${l.val}</b> <small>(${l.who})</small>
-                <div style="font-size:0.75rem; color:#888;">${l.note} | ${l.time}</div></div>
-                <i class="fas fa-trash-alt" style="color:#e74c3c; cursor:pointer;" onclick="deleteItem(${l.id})"></i>
-            </div>`).join('') || '<p style="text-align:center; opacity:0.5; margin-top:30px;">لا يوجد سجل</p>';
+            <div class="history-item" style="border-right-color:${colors[l.cat]}">
+                <div><span class="cat-badge" style="background:${colors[l.cat]}">${l.cat}</span> <b>${l.val} ريال</b> - ${l.who}</div>
+                <i class="fas fa-trash-alt" style="color:red; cursor:pointer" onclick="deleteItem(${l.id})"></i>
+            </div>`).join('');
     }
+
+    function deleteItem(id) { if(confirm("حذف؟")) { state.logs = state.logs.filter(l => l.id !== id); updateUI(); } }
+    function openModal() { document.getElementById('logModal').style.display = "block"; }
+    function closeModal() { document.getElementById('logModal').style.display = "none"; }
+
+    // وظائف قاعدة البيانات
+    function downloadBackup() {
+        const data = JSON.stringify(state.logs);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `نسخة_احتياطية_الحلال_${new Date().toLocaleDateString()}.json`;
+        a.click();
+    }
+
+    function importBackup(e) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            state.logs = JSON.parse(e.target.result);
+            updateUI();
+            alert("تم استرداد البيانات بنجاح!");
+        };
+        reader.readAsText(file);
+    }
+
+    function exportToExcel() {
+        let csv = "\uFEFFالبيان,المبلغ,الشخص/النوع,التاريخ\n";
+        state.logs.forEach(l => { csv += `${l.note},${l.val},${l.who},${l.time}\n`; });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "سجل_حسابات_المشروع.csv";
+        link.click();
+    }
+
+    updateUI();
 </script>
 </body>
 </html>
